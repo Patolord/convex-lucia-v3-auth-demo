@@ -4,13 +4,10 @@ import { v } from "convex/values";
 // maybe have a profile table for public information
 const users = defineEnt({
   id: v.string(),
-
   email: v.string(),
-
   password_hash: v.string(),
 })
   .index("byId", ["id"])
-
   .index("byEmail", ["email"]);
 
 const sessions = defineEnt({
@@ -23,7 +20,6 @@ const sessions = defineEnt({
 
 const schema = defineEntSchema({
   users,
-
   sessions,
 });
 
