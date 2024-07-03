@@ -6,6 +6,7 @@ import { useQuery } from "./usingSession";
 
 function App() {
   const user = useQuery(api.users.get, {});
+  console.log(user);
 
   return (
     <main>

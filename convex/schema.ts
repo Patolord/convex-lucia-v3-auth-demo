@@ -1,38 +1,31 @@
-import { defineSchema, defineTable } from "convex/server";
-import { Validator, v } from "convex/values";
+import { defineEnt, defineEntSchema, getEntDefinitions } from "convex-ents";
+import { v } from "convex/values";
 
-export default defineSchema({
-  ...authTables({
-    user: { email: v.string() },
-    session: {},
-  }),
+// maybe have a profile table for public information
+const users = defineEnt({
+  id: v.string(),
+
+  email: v.string(),
+
+  password_hash: v.string(),
+})
+  .index("byId", ["id"])
+
+  .index("byEmail", ["email"]);
+
+const sessions = defineEnt({
+  id: v.string(),
+  user_id: v.string(),
+  expires_at: v.float64(),
+})
+  .index("byId", ["id"])
+  .index("byUserId", ["user_id"]);
+
+const schema = defineEntSchema({
+  users,
+
+  sessions,
 });
 
-function authTables<
-  UserFields extends Record<string, Validator<any, any, any>>,
-  SchemaFields extends Record<string, Validator<any, any, any>>
->({ user, session }: { user: UserFields; session: SchemaFields }) {
-  return {
-    users: defineTable({
-      ...user,
-      id: v.string(),
-    }).index("byId", ["id"]),
-    sessions: defineTable({
-      ...session,
-      id: v.string(),
-      user_id: v.string(),
-      active_expires: v.float64(),
-      idle_expires: v.float64(),
-    })
-      // `as any` because TypeScript can't infer the table fields correctly
-      .index("byId", ["id" as any])
-      .index("byUserId", ["user_id" as any]),
-    auth_keys: defineTable({
-      id: v.string(),
-      hashed_password: v.union(v.string(), v.null()),
-      user_id: v.string(),
-    })
-      .index("byId", ["id"])
-      .index("byUserId", ["user_id"]),
-  };
-}
+export default schema;
+export const entDefinitions = getEntDefinitions(schema);
